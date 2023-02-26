@@ -1,3 +1,5 @@
+import React from 'react'
+
 export async function getServerSideProps() {
   const res = await fetch('https://hacker-news.firebaseio.com/v0/item/30167605.json')
   const data = await res.json()
@@ -7,6 +9,19 @@ export async function getServerSideProps() {
 }
 
 export default function Page(props) {
+  const [response, setResponse] = React.useState(null)
+  const submitForm = async () => {
+    try {
+      setResponse(null)
+      const res = await fetch('/api/test', { method: 'POST' })
+      const json = await res.json()
+      setResponse(json)
+    } catch (err) {
+      console.error(err)
+      setResponse(`Request failed: ${err}`)
+    }
+  }
+
   return (
     <div>
       <style type="text/css" global>{`
@@ -29,9 +44,9 @@ export default function Page(props) {
       <p>Here's what we got using <code>fetch()</code> from <code>getServerSideProps</code>:</p>
       <pre>{JSON.stringify(props.data)}</pre>
 
-      <h2>API route</h2>
-      <p>Here's the API route:</p>
-      <iframe src="/api/test"></iframe>
+      <h2>API route via POST</h2>
+      <p>Click <button onClick={submitForm}>Submit</button> to load the API route via a POST request</p>
+      <pre>{JSON.stringify(response)}</pre>
     </div>
   );
 }
